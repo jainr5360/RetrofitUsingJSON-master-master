@@ -55,18 +55,19 @@ public class MenuHomeAdapter extends RecyclerView.Adapter<MenuHomeAdapter.ViewHo
         String url = details.getImg().toString();
         Picasso.with(context).load(url).into(holder.ivBgRow);
 
-        boolean checkexit = addToCartDB.insertToCartTable(details.getId(), details.getName());
+        for (int i = 0; i < homeDetailsList.size(); i++) {
 
-        if (checkexit == false) {
+            boolean checkexit = addToCartDB.insertToCartTable(homeDetailsList.get(i).getId(), homeDetailsList.get(i).getName(), homeDetailsList.get(i).getImg());
 
-            Toast.makeText(context, "This Product Is Already Exit", Toast.LENGTH_SHORT).show();
+            if (checkexit == false) {
 
+                Toast.makeText(context, "This Product Is Already Exit", Toast.LENGTH_SHORT).show();
+
+            }
+            if (checkexit == true) {
+                Toast.makeText(context, "Product Added Successfully", Toast.LENGTH_SHORT).show();
+            }
         }
-        if (checkexit == true) {
-            Toast.makeText(context, "Product Added Successfully", Toast.LENGTH_SHORT).show();
-        }
-
-
     }
 
     @Override
@@ -82,7 +83,6 @@ public class MenuHomeAdapter extends RecyclerView.Adapter<MenuHomeAdapter.ViewHo
 
         public ViewHolder(View itemView) {
             super(itemView);
-
 
             tv = (TextView) itemView.findViewById(R.id.txtview_menu_home);
             ivBgRow = itemView.findViewById(R.id.iv_bg);

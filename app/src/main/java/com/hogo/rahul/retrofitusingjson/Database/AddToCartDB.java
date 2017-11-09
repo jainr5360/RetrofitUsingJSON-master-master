@@ -26,8 +26,9 @@ public class AddToCartDB extends SQLiteOpenHelper {
     public static final String KEY_ID = "keyId";
     public static final String ITEM_ID = "itemId";
     public static final String ITEM_NAME = "itemname";
-
-    public static final String CREATE_TABLE_ADDTOCART = "CREATE TABLE " + TABLE_NAME + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + ITEM_ID + " VARCHAR, " + ITEM_NAME + " VARCHAR);";
+    public static final String ITEM_IMAGE = "itemimage";
+    public static final String CREATE_TABLE_ADDTOCART = "CREATE TABLE " + TABLE_NAME + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + ITEM_ID + " VARCHAR, " + ITEM_NAME +
+            " VARCHAR," + ITEM_IMAGE + "BLOB);";
     SQLiteDatabase sdb;
 
     public AddToCartDB(Context context) {
@@ -51,7 +52,7 @@ public class AddToCartDB extends SQLiteOpenHelper {
 
     }
 
-    public boolean insertToCartTable(String itemId, String parentItemName) {
+    public boolean insertToCartTable(String itemId, String parentItemName, String itemimage) {
 
         Cursor cursor = null;
 //        String finalCost = String.valueOf(cost);
@@ -71,7 +72,7 @@ public class AddToCartDB extends SQLiteOpenHelper {
                 ContentValues values = new ContentValues();
                 values.put(ITEM_ID, "" + itemId);
                 values.put(ITEM_NAME, "" + parentItemName);
-
+                values.put(ITEM_IMAGE, "" + itemimage);
                 this.sdb.insert(TABLE_NAME, null, values);
 
                 return true;
@@ -80,6 +81,17 @@ public class AddToCartDB extends SQLiteOpenHelper {
             sdb.close();
             return false;
         }
+    }
+
+    public Cursor queueArticlesDetails() {
+        Cursor cursor;
+        System.out.println("420");
+
+        cursor = this.getReadableDatabase().rawQuery(
+                "select  * from " + TABLE_NAME + " ORDER BY (" + KEY_ID + ") ", null);
+
+        return cursor;
+
     }
 
 

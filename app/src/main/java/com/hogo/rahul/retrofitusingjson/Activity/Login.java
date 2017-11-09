@@ -39,14 +39,16 @@ public class Login extends AppCompatActivity {
         etPassword = findViewById(R.id.et_password);
         etEmail = findViewById(R.id.et_email);
 
-        email = etEmail.getText().toString();
-        password = etPassword.getText().toString();
-        fcm = "ghsdbjfsdbsdfjsb";
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendPost(email, password, fcm);
+
+                email = etEmail.getText().toString();
+                password = etPassword.getText().toString();
+                fcm = "ghsdbjfsdbsdfjsb";
+
+                sendPost();
             }
         });
 
@@ -83,10 +85,10 @@ public class Login extends AppCompatActivity {
 //        mResponseTv.setText(response);
 //    }
 
-    private void sendPost(String email, String password, String fcm) {
+    private void sendPost() {
 
         retrofit2.Call<LoginModel> call = null;
-        call = Utils.getWebService().getDataLogin(email, password, fcm);
+        call = Utils.getWebService().getDataLogin(this.email, this.password, fcm);
         Log.e("115 ", ": :" + call.request().url().toString());
         call.enqueue(new Callback<LoginModel>() {
             @Override
@@ -96,10 +98,6 @@ public class Login extends AppCompatActivity {
                 Log.e("DependentList", " : " + response.code());
 
                 LoginModel myResponse = response.body();
-
-
-//                rvSubitemId.setAdapter(itemAdapter);
-//                rvSubitemId.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
 
 
             }

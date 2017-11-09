@@ -2,6 +2,7 @@ package com.hogo.rahul.retrofitusingjson.Activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 import com.hogo.rahul.retrofitusingjson.Adapter.MenuHomeAdapter;
 import com.hogo.rahul.retrofitusingjson.Database.AddToCartDB;
 import com.hogo.rahul.retrofitusingjson.R;
+import com.hogo.rahul.retrofitusingjson.Retrofit2.RestJsonClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,22 +26,31 @@ import retrofit2.Response;
 public class Dashboard extends AppCompatActivity {
 
     ArrayList<Userdatum> mlist = new ArrayList<>();
-    List<Userdatum> detailsList = new ArrayList<>();
     MenuHomeAdapter adapter;
     RecyclerView rvMenu;
     String name;
     String image;
+    Context context = this;
     String id;
-    AddToCartDB addToCartDB;
+    ArrayList<Userdatum> listArrlist;
+    AddToCartDB db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
         rvMenu = (RecyclerView) findViewById(R.id.rv_menu);
-
+        db = new AddToCartDB(context);
         getData();
 
+        if (RestJsonClient.isNetworkAvailable1(Dashboard.this))
+            getData();
+        else
+            getDatabase();
+
+//        getData();
+
+        //
         rvMenu.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), rvMenu, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
@@ -72,10 +83,24 @@ public class Dashboard extends AppCompatActivity {
                 try {
                     if (!mlist.isEmpty()) {
 
-                        adapter = new MenuHomeAdapter(getApplicationContext(), mlist);
-                        rvMenu.setAdapter(adapter);
-                        rvMenu.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                        for (int i = 0; i < mlist.size(); i++) {
 
+//                            Boolean checkexit = db.insertToCartTable(mlist.get(i).getId().toString(),
+//                                    mlist.get(i).getName().toString(), mlist.get(i).getImg().toString()
+//                            );
+//                            if (checkexit == false) {
+//
+//                                Toast.makeText(context, "This Product Is Already Exit", Toast.LENGTH_SHORT).show();
+//
+//                            }
+//                            if (checkexit == true) {
+//                                Toast.makeText(context, "Product Added Successfully", Toast.LENGTH_SHORT).show();
+//                            }
+
+                            adapter = new MenuHomeAdapter(getApplicationContext(), mlist);
+                            rvMenu.setAdapter(adapter);
+                            rvMenu.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                        }
                     } else {
                         Toast.makeText(getApplicationContext(), "List is empty", Toast.LENGTH_SHORT).show();
                     }
@@ -92,6 +117,34 @@ public class Dashboard extends AppCompatActivity {
 
             }
         });
+    }
+
+    void getDatabase() {
+
+        Cursor cursor = db.queueArticlesDetails();
+
+        for (cursor.moveToFirst(); !(cursor.isAfterLast()); cursor.moveToNext()) {
+
+            Userdatum list = new Userdatum();
+            list.setId(cursor.getString(cursor.getColumnIndex(AddToCartDB.ITEM_ID)));
+            list.setName(cursor.getString(cursor.getColumnIndex(AddToCartDB.ITEM_NAME)));
+//            list.setImg(cursor.getString(cursor.getColumnIndex(AddToCartDB.ITEM_IMG)));
+            mlist.add(list);
+        }
+
+        try {
+//            customImageAdapter = new CustomImageAdapter(getApplicationContext(), listArrlist);
+//            listView.setAdapter(customImageAdapter);
+
+
+            adapter = new MenuHomeAdapter(getApplicationContext(), mlist);
+            rvMenu.setAdapter(adapter);
+            rvMenu.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
